@@ -129,6 +129,12 @@ Private Sub LoadColors()
 
 End Sub
 
+' Returns the color value of Index from array ColorPalette
+' which holds the Windows Phone Theme Colors.
+' If ColorPalette is empty, LoadColors is called to fill it.
+'
+' 2017-04-21. Gustav Brock, Cactus Data ApS, CPH.
+'
 Public Function PaletteColor( _
     ByVal Index As Integer) _
     As Long

@@ -30,8 +30,6 @@ Public Sub Terminate()
 
 End Sub
 
-
-
 Private Sub ClassTextBox_Click()
 
     ' Select full content.
