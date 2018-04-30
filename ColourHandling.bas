@@ -1,9 +1,10 @@
+Attribute VB_Name = "ColourHandling"
 Option Explicit
 
 ' Generic functions for conversion of colour values.
 ' Supplements the native VBA.RGB function.
-' 2017-04-19. Gustav Brock, Cactus Data ApS, CPH.
-' Version 1.0.0
+' 2018-04-30. Gustav Brock, Cactus Data ApS, CPH.
+' Version 1.0.1
 ' License: MIT.
 
 ' *
@@ -158,3 +159,79 @@ Public Function RGBHex( _
     RGBHex = HexRGB
     
 End Function
+
+' Returns the compound RGB value from discrete CMYK values.
+' CMYK values must represent integer percent values: 0 to 100.
+'
+' Examples:
+'   Color = RGBCMYK(0, 100, 100, 0)
+'   ' Color = 255
+'   Color = RGBCMYK(0, 100, 100, 50)
+'   ' Color = 128
+'   Color = RGBCMYK(0, 0, 0, 100)
+'   ' Color = 0
+'   Color = RGBCMYK(100, 100, 100, 0)
+'   ' Color = 0
+'   Color = RGBCMYK(100, 100, 100, 50)
+'   ' Color = 0
+'   Color = RGBCMYK(0, 0, 0, 0)
+'   ' Color = 16777215
+'
+' 2018-04-30. Gustav Brock, Cactus Data ApS, CPH.
+'
+Public Function RGBCMYK( _
+    ByVal Cyan As Double, _
+    ByVal Magenta As Double, _
+    ByVal Yellow As Double, _
+    ByVal Black As Double) _
+    As Long
+
+    ' Minimum and maximum values.
+    Const MaxRGB    As Double = &HFF
+    Const MaxCMYK   As Double = 100
+    Const MinCMYK   As Double = 0
+    
+    Const Half      As Double = 0.5
+    
+    Dim Brightness  As Double
+    Dim Red         As Integer
+    Dim Green       As Integer
+    Dim Blue        As Integer
+    Dim Color       As Long
+    
+    ' Limit input to acceptable range for CMYK values.
+    If Cyan < MinCMYK Then
+        Cyan = MinCMYK
+    ElseIf Cyan > MaxCMYK Then
+        Cyan = MaxCMYK
+    End If
+    If Magenta < MinCMYK Then
+        Magenta = MinCMYK
+    ElseIf Magenta > MaxCMYK Then
+        Magenta = MaxCMYK
+    End If
+    If Yellow < MinCMYK Then
+        Yellow = MinCMYK
+    ElseIf Yellow > MaxCMYK Then
+        Yellow = MaxCMYK
+    End If
+    If Black < MinCMYK Then
+        Black = MinCMYK
+    ElseIf Black > MaxCMYK Then
+        Black = MaxCMYK
+    End If
+    
+    ' Calculate brightness factor.
+    Brightness = Int(MaxRGB / MaxCMYK * (MaxCMYK - Black) + Half) / MaxCMYK
+    ' Calculate RGB colours.
+    Red = Brightness * (MaxCMYK - Cyan)
+    Green = Brightness * MaxCMYK * (MaxCMYK - Magenta)
+    Blue = Brightness * MaxCMYK * (MaxCMYK - Yellow)
+    
+    ' Calculate RGB compound value.
+    Color = RGB(Red, Green, Blue)
+    
+    RGBCMYK = Color
+    
+End Function
+
