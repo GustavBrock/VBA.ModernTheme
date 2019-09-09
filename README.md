@@ -17,5 +17,5 @@ Full documentation is found here:
 [Create Windows Phone Colour Palette and Selector using WithEvents](https://www.experts-exchange.com/articles/29554/Create-Windows-Phone-Colour-Palette-and-Selector-using-WithEvents.html)
 
 <hr>If you wish to support my work or need extended support or advice, feel free to:
-
+<p>
 ![BuyMeACoffee](https://raw.githubusercontent.com/GustavBrock/VBA.ModernTheme/master/images/BuyMeACoffee.png)
