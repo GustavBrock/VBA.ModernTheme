@@ -14,7 +14,7 @@ Full documentation is found here:
 
 ![EE Logo](https://raw.githubusercontent.com/GustavBrock/VBA.ModernTheme/master/images/EE%20Logo.png)
 
-[Create Windows Phone Colour Palette and Selector using WithEvents](https://www.experts-exchange.com/articles/29554/Create-Windows-Phone-Colour-Palette-and-Selector-using-WithEvents.html)
+[Create Windows Phone Colour Palette and Selector using WithEvents](https://www.experts-exchange.com/articles/29554/Create-Windows-Phone-Colour-Palette-and-Selector-using-WithEvents.html?preview=yawJg2wkMzc%3D)
 
 <hr>
 
