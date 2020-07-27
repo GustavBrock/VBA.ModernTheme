@@ -5,7 +5,7 @@ Option Explicit
 ' Supplements the native VBA.RGB function.
 '
 ' 2020-07-27. Gustav Brock, Cactus Data ApS, CPH.
-' Version 1.1.0
+' Version 1.1.1
 ' License: MIT.
 
 ' *
@@ -320,4 +320,26 @@ Public Sub CompositeRGB( _
     End If
 
 End Sub
+
+' Calculates the inverse RGB colour value from Color.
+'
+' 2017-03-26. Gustav Brock, Cactus Data ApS, CPH.
+'
+Public Function RGBInverse( _
+    ByVal Color As Long) _
+    As Long
+    
+    Const ColorMax          As Byte = 255
+    
+    Dim Red                 As Integer
+    Dim Green               As Integer
+    Dim Blue                As Integer
+    Dim InverseColor        As Long
+    
+    Call CompositeRGB(Color, Red, Green, Blue)
+    InverseColor = RGB(ColorMax - Red, ColorMax - Green, ColorMax - Blue)
+    
+    RGBInverse = InverseColor
+
+End Function
 
