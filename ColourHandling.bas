@@ -3,66 +3,44 @@ Option Explicit
 
 ' Generic functions for conversion of colour values.
 ' Supplements the native VBA.RGB function.
-' 2018-04-30. Gustav Brock, Cactus Data ApS, CPH.
-' Version 1.0.1
+'
+' 2020-07-27. Gustav Brock, Cactus Data ApS, CPH.
+' Version 1.1.0
 ' License: MIT.
 
 ' *
 
-' Calculate discrete RGB colours from a composite colour value and
-' return one component.
-' Also, by reference, return all components.
+' Returns one RGB component from a composite colour value.
 '
-' Examples:
-'   Simple print of the components:
+' Example:
 '
-'   SomeColor = 813466
-'   RGBComponent SomeColor
-'   ' Debug Print:
-'   ' 154           105           12
+'   Get the green component from a colour value:
 '
-'   Get one component from a colour value:
+'   Dim SomeColor       As Long
+'   Dim ColorComponent  As Integer
 '
-'   Dim SomeColor   As Long
-'   Dim Green       As Integer
 '   SomeColor = 13466
-'   Green = RGBComponent(SomeColor, vbGreen)
-'   ' Green ->  52
-'
-'   Get all components from a colour value:
-'
-'   Dim SomeColor   As Long
-'   Dim Red         As Integer
-'   Dim Green       As Integer
-'   Dim Blue        As Integer
-'   SomeColor = 813466
-'   RGBComponent SomeColor, , Red, Green, Blue
-'   ' Red   -> 154
-'   ' Green -> 105
-'   ' Green ->  12
+'   ColorComponent = RGBComponent(SomeColor, ColorConstants.vbGreen)
+'   ' ColorComponent ->  52
 '
 ' 2017-03-26. Gustav Brock, Cactus Data ApS, CPH.
 '
 Public Function RGBComponent( _
     ByVal RGB As Long, _
-    Optional ByVal Component As Long, _
-    Optional ByRef Red As Integer, _
-    Optional ByRef Green As Integer, _
-    Optional ByRef Blue As Integer) _
+    Optional ByVal Component As Long) _
     As Integer
     
+    Dim Red     As Integer
+    Dim Green   As Integer
+    Dim Blue    As Integer
     Dim Color   As Long
   
     If RGB <= 0 Then
-        ' Return Black.
-        Red = 0
-        Green = 0
-        Blue = 0
+        ' Return component of black.
+        Color = 0
     Else
-        ' Extract the discrete colours from the composite RGB.
-        Red = RGB And vbRed
-        Green = (RGB And vbGreen) / &H100
-        Blue = (RGB And vbBlue) / &H10000
+        ' Extract the discrete colour values from the composite RGB.
+        Call CompositeRGB(RGB, Red, Green, Blue)
         ' Return chosen colour component.
         Select Case Component
             Case vbRed
@@ -72,11 +50,10 @@ Public Function RGBComponent( _
             Case vbBlue
                 Color = Blue
             Case Else
+                ' Other or invalid member of ColorConstants passed.
                 Color = vbBlack
         End Select
     End If
-    
-    ' Debug.Print Red, Green, Blue
     
     RGBComponent = Color
 
@@ -144,7 +121,7 @@ Public Function RGBHex( _
     Dim Blue    As Integer
     Dim HexRGB  As String
     
-    RGBComponent Color, , Red, Green, Blue
+    Call CompositeRGB(Color, Red, Green, Blue)
     
     If Not NoPrefix Then
         ' Set prefix.
@@ -234,4 +211,113 @@ Public Function RGBCMYK( _
     RGBCMYK = Color
     
 End Function
+
+' Calculates the RGB colour value from Color brighted by Bright percent.
+'
+' 2015-02-02. Cactus Data ApS, CPH
+'
+Public Function RGBColorBright( _
+    ByVal Color As Long, _
+    ByVal Bright As Byte) _
+    As Long
+    
+    Const ColorMax          As Byte = 255
+    Const BrightFull        As Byte = 100
+    
+    Dim Red                 As Integer
+    Dim Green               As Integer
+    Dim Blue                As Integer
+    Dim BrightColor         As Long
+    Dim Factor              As Double
+    
+    If Bright > BrightFull Then
+        Bright = BrightFull
+    End If
+    Factor = (BrightFull + Bright) / BrightFull
+    
+    Call CompositeRGB(Color, Red, Green, Blue)
+    Red = Red * Factor
+    Green = Green * Factor
+    Blue = Blue * Factor
+    If Red > ColorMax Then
+        Red = ColorMax
+    End If
+    If Green > ColorMax Then
+        Green = ColorMax
+    End If
+    If Blue > ColorMax Then
+        Blue = ColorMax
+    End If
+    BrightColor = RGB(Red * Factor, Green * Factor, Blue * Factor)
+    
+    RGBColorBright = BrightColor
+
+End Function
+
+' Calculates the RGB colour value from Color shaded by Shade percent.
+'
+' 2015-02-01. Cactus Data ApS, CPH
+'
+Public Function RGBColorShade( _
+    ByVal Color As Long, _
+    ByVal Shade As Integer) _
+    As Long
+    
+    Const ShadeNone         As Byte = 100
+    
+    Dim Red                 As Integer
+    Dim Green               As Integer
+    Dim Blue                As Integer
+    Dim ShadedColor         As Long
+    Dim Factor              As Double
+    
+    If Shade > ShadeNone Then
+        Shade = ShadeNone
+    End If
+    Factor = (ShadeNone - Shade) / ShadeNone
+    
+    Call CompositeRGB(Color, Red, Green, Blue)
+    ShadedColor = RGB(Red * Factor, Green * Factor, Blue * Factor)
+    
+    RGBColorShade = ShadedColor
+
+End Function
+
+' Returns by reference the RGB components of a composite colour value.
+'
+' Examples:
+'
+'   Dim SomeColor   As Long
+'   Dim Red         As Integer
+'   Dim Green       As Integer
+'   Dim Blue        As Integer
+'
+'   SomeColor = 813466
+'   CompositeRGB SomeColor, Red, Green, Blue
+'   ' Red   -> 154
+'   ' Green -> 105
+'   ' Green ->  12
+'
+' 2017-03-26. Gustav Brock, Cactus Data ApS, CPH.
+'
+Public Sub CompositeRGB( _
+    ByVal RGB As Long, _
+    ByRef Red As Integer, _
+    ByRef Green As Integer, _
+    ByRef Blue As Integer)
+    
+    If RGB < 0 Then
+        ' Nothing to do.
+        ' Return the components of black.
+        Red = 0
+        Green = 0
+        Blue = 0
+    Else
+        ' Dissolve the composite RGB value into its discrete colours.
+        Red = RGB And vbRed
+        Green = (RGB And vbGreen) / &H100
+        Blue = (RGB And vbBlue) / &H10000
+    End If
+
+End Sub
 
